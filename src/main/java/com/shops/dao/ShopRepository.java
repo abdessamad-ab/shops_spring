@@ -1,8 +1,7 @@
 package com.shops.dao;
 
 import com.shops.entities.Shop;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -15,21 +14,20 @@ import org.springframework.stereotype.Repository;
 public interface ShopRepository extends MongoRepository<Shop, String>{
 
     /**
-     * Method that looks for shops sorted by distance based on
+     * Method that looks for all shops sorted by distance based on
      * a position given by longitude and latitude
      * @param longitude longitude
      * @param latitude latitude
-     * @param pageable contains number of page and its size
      * @return Page
      */
-    @Query(value = "{\"location\":\n" +
-"       { $near :\n" +
-"          {\n" +
-"            $geometry : {\n" +
-"               type : \"Point\" ,\n" +
-"               coordinates : [ ?0, ?1] }\n" +
-"          }\n" +
+    @Query(value = "{location:" +
+"       { $near :" +
+"          {" +
+"            $geometry : {" +
+"               type : 'Point' ," +
+"               coordinates : [ ?0, ?1] }" +
+"          }" +
 "       }}")
-    public Page<Shop> nearByShops(double longitude, double latitude, Pageable pageable);
+    public List<Shop> nearByShops(double longitude, double latitude);
     
 }

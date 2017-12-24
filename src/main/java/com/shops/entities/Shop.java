@@ -1,6 +1,7 @@
 package com.shops.entities;
 
 import java.io.Serializable;
+import java.util.Objects;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -70,6 +71,37 @@ public class Shop implements Serializable{
     public String toString() {
         return "Shop{" + "name=" + name + ", email=" + email + ", city=" + city + ", picture=" + picture + ", location=" + location + '}';
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Shop other = (Shop) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        if (!Objects.equals(this.name, other.name)) {
+            return false;
+        }
+        if (!Objects.equals(this.email, other.email)) {
+            return false;
+        }
+        if (!Objects.equals(this.city, other.city)) {
+            return false;
+        }
+        if (!Objects.equals(this.picture, other.picture)) {
+            return false;
+        }
+        return true;
+    }
+    
     
     
 }

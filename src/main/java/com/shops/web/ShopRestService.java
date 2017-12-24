@@ -2,15 +2,18 @@
  */
 package com.shops.web;
 
+import com.shops.dao.DislikedShopRepository;
 import com.shops.dao.ShopRepository;
+import com.shops.dao.UserRepository;
 import com.shops.entities.Shop;
+import com.shops.entities.DislikedShop;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -24,20 +27,62 @@ public class ShopRestService {
     @Autowired
     private ShopRepository shopRepository;
     
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Autowired
+    private DislikedShopRepository dislikedShopRepository;
+    
     /**
-     * Route for the shops sorted by distance, based on
+     * Route for all the shops sorted by distance, based on
      * a position given by longitude and latitude
      * @param longitude longitude
      * @param latitude latitude
-     * @param page the number of page to query
-     * @param pageSize the number of items per page
      * @return 
      */
     @GetMapping(value = "/nearby/{longitude}/{latitude}")
-    public Page<Shop> nearByShops(@PathVariable double longitude, @PathVariable double latitude, 
-            @RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "pageSize", defaultValue = "8") int pageSize){
-        System.out.println("pageSize:"+ pageSize+"page:"+ page);
-        return shopRepository.nearByShops(longitude, latitude, new PageRequest(page, pageSize));
+    public List<Shop> allNearByShops(@PathVariable double longitude, @PathVariable double latitude){
+        return shopRepository.nearByShops(longitude, latitude);
+    }
+    
+    /**
+     * Route for the nearby shops, excluding disliked shops by user less than 2 hours a go,
+     * sorted by distance, based on a position given by longitude and latitude
+     * @param longitude longitude
+     * @param latitude latitude
+     * @param username username
+     * @return 
+     */
+    @GetMapping(value = "/nearby/{longitude}/{latitude}/{username}")
+    public List<Shop> nearByShopsByUser(@PathVariable double longitude, @PathVariable double latitude, @PathVariable String username){
+        List<Shop> nearByShops = shopRepository.nearByShops(longitude, latitude);
+        List<DislikedShop> dislikedShops = dislikedShopRepository.findDislikedShops(username,LocalDateTime.now().minusHours(2));
+        
+        /**
+         * Extracting a list of shops from the DislikedShop list
+         * without the username and disliked_at attributes
+         */
+        List<Shop> tempArray = dislikedShops.stream().map(shop -> {
+           return shop.getShop();
+        }).collect(Collectors.toList());
+        
+        /**
+         * removing the disliked shops from the nearby shops
+         */
+        nearByShops.removeAll(tempArray);
+        
+        return nearByShops;
+    }
+    
+    /**
+     * Route for the preferred shops by user
+     * @param username
+     * @return 
+     */
+    @GetMapping(value = "/likedShops/{username}")
+    public List<Shop> likedShops(@PathVariable String username){
+        List<Shop> shops = (userRepository.findByUsername(username)).getLikedShops();
+        return shops;
     }
     
 }
