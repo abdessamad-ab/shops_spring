@@ -42,7 +42,7 @@ public class ShopRestService {
      * @param latitude latitude
      * @return
      */
-    @GetMapping(value = "/nearby/{longitude}/{latitude}")
+    @GetMapping(value = "/allNearby/{longitude}/{latitude}")
     public List<Shop> allNearByShops(@PathVariable double longitude, @PathVariable double latitude) {
         return shopRepository.nearByShops(longitude, latitude);
     }

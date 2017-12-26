@@ -68,5 +68,5 @@ public class User implements Serializable{
     public void setLikedShops(List<Shop> likedShops) {
         this.likedShops = likedShops;
     }
-    
+
 }
