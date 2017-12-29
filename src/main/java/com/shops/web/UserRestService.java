@@ -6,8 +6,8 @@ import com.shops.dao.UserRepository;
 import com.shops.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -21,9 +21,14 @@ public class UserRestService {
     @Autowired
     private UserRepository userRepository;
     
-    @GetMapping(value = "/authentication")
-    public User login(@RequestParam String email, @RequestParam String password) {
-        User userDb = this.userRepository.findByEmailAndPassword(email, password);
+    /**
+     * Authentication Route
+     * @param user
+     * @return 
+     */
+    @PostMapping(value = "/authentication")
+    public User login(@RequestBody User user) {
+        User userDb = this.userRepository.findByEmailAndPassword(user.getEmail(), user.getPassword());
         if(userDb != null){
          /**
          * clear the likedShops list to loosen the user object
@@ -34,16 +39,19 @@ public class UserRestService {
         return userDb;
     }
     
-    @GetMapping(value = "/register")
-    public User register(@RequestParam String email, @RequestParam String password, @RequestParam String username) {
-        User userDb = this.userRepository.findByEmailAndPassword(email, password);
+    /**
+     * Register Route
+     * @param user
+     * @return 
+     */
+    @PostMapping(value = "/register")
+    public boolean register(@RequestBody User user) {
+        User userDb = this.userRepository.findByEmailOrUsername(user.getEmail(), user.getUsername());
         if(userDb != null){
-         /**
-         * clear the likedShops list to loosen the user object
-         */
-        userDb.getLikedShops().clear();
+            return false;
         }
         
-        return userDb;
+        userRepository.insert(user);
+        return true;
     }
 }

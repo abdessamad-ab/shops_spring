@@ -58,7 +58,7 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
         http.cors()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/authentication", "/shops/allNearby/**").permitAll()
+                .antMatchers("/authentication", "/register", "/shops/allNearby/**").permitAll()
                 .anyRequest().authenticated();
     }
 

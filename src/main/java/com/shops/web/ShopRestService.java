@@ -12,8 +12,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -77,14 +79,14 @@ public class ShopRestService {
     }
 
     /**
-     * Route to add a new preferred shops by user
+     * Route to add a new preferred shop by user
      *
      * @param shopId
      * @param username
      * @return
      */
-    @GetMapping(value = "/likeShop/{shopId}/{username}")
-    public List<Shop> likeShop(@PathVariable String shopId, @PathVariable String username) {
+    @PutMapping(value = "/likeShop/{shopId}/{username}")
+    public boolean likeShop(@PathVariable String shopId, @PathVariable String username) {
         User user = userRepository.findByUsername(username);
         List<Shop> likedShops = user.getLikedShops();
         Shop shopToLike = shopRepository.findOne(shopId);
@@ -92,7 +94,7 @@ public class ShopRestService {
          * the likedShops list has not changed
          */
         if (shopToLike == null || likedShops.contains(shopToLike)) {
-            return likedShops;
+            return false;
         }
 
         /**
@@ -100,7 +102,7 @@ public class ShopRestService {
          */
         user.getLikedShops().add(shopToLike);
         userRepository.save(user);
-        return user.getLikedShops();
+        return true;
     }
 
     /**
@@ -110,7 +112,7 @@ public class ShopRestService {
      * @param username
      * @return
      */
-    @GetMapping(value = "/removeLikedShop/{shopId}/{username}")
+    @DeleteMapping(value = "/removeLikedShop/{shopId}/{username}")
     public List<Shop> removeLikeShop(@PathVariable String shopId, @PathVariable String username) {
         User user = userRepository.findByUsername(username);
         Shop shopToRemove = shopRepository.findOne(shopId);
@@ -136,23 +138,21 @@ public class ShopRestService {
      * @param username
      * @return
      */
-    @GetMapping(value = "/dislikeShop/{shopId}/{username}")
-    public Shop dislikeShop(@PathVariable String shopId, @PathVariable String username) {
+    @PutMapping(value = "/dislikeShop/{shopId}/{username}")
+    public boolean dislikeShop(@PathVariable String shopId, @PathVariable String username) {
         Shop shopToDislike = shopRepository.findOne(shopId);
         DislikedShop dislikedShopByUser = dislikedShopRepository.findByUsernameAndShop(username, shopToDislike);
         List<DislikedShop> listDislikedShops = dislikedShopRepository.findByUsername(username);
         
-        System.out.println("dislikedShop: "+ dislikedShopByUser);
         /**
          * Insert a new dislikedShop in DB
          */
         if (!listDislikedShops.contains(dislikedShopByUser)) {
-            System.out.println("in if");
             dislikedShopRepository.insert(new DislikedShop(username,shopToDislike));
-            return shopToDislike;
+            return true;
         }
         
-        return null;
+        return false;
     }
 
     private List<Shop> nearByShopsDislikedExcluded(double longitude, double latitude, String username) {
