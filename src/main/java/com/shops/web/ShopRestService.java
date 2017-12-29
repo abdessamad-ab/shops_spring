@@ -33,7 +33,7 @@ public class ShopRestService {
 
     @Autowired
     private DislikedShopRepository dislikedShopRepository;
-
+    
     /**
      * Route for all the shops sorted by distance, based on a position given by
      * longitude and latitude

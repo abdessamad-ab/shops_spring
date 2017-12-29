@@ -50,14 +50,15 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-//        http.csrf().disable();
+        http.csrf().disable();
         http.httpBasic();
         /**
          * // by default http.cors() uses a Bean by the name of corsConfigurationSource
          */
-        http.cors().and()
+        http.cors()
+                .and()
                 .authorizeRequests()
-                .antMatchers("/authentication").permitAll()
+                .antMatchers("/authentication", "/shops/allNearby/**").permitAll()
                 .anyRequest().authenticated();
     }
 
