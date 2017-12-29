@@ -7,7 +7,9 @@ Shops catalog, using Spring boot and Spring security with MongoDB
 * Install [MongoDB](https://www.mongodb.com/download-center#community)
 * After Install :
   - Run the MongoDB server using port 50123 `mongod --port 50123`
-  - Unzip Dump, go to the unzipped directory and run `mongorestore --db shops --port 50123 shops`
+  - Restoring shops database :
+    -Unzip [Dump](https://github.com/abdessamad-ab/shops_spring/blob/master/shops.rar)
+    -Go to the unzipped directory and run `mongorestore --db shops --port 50123 shops`
     
 ## 2- Running maven project
 
